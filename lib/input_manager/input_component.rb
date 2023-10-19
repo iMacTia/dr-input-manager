@@ -16,14 +16,29 @@ module InputManager
 
     def process_action(action)
       action.bindings.each do |binding|
-        if binding.is_a?(Array)
-          next unless binding.all? { |b| b.active_on?(control_scheme) }
-        else
-          next unless binding.active_on?(control_scheme)
-        end
+        bindings = corce_binding(binding)
 
-        event_name = "on_#{action.name}".to_sym
-        send(event_name) if respond_to?(event_name)
+        values = bindings.map { |b| b.value_on(control_scheme) }
+        next unless values.all?
+
+        call_listener(action, values.last)
+      end
+    end
+
+    def corce_binding(binding)
+      return binding if binding.is_a?(Array)
+
+      [binding]
+    end
+
+    def call_listener(action, value)
+      event_name = "on_#{action.name}".to_sym
+      return unless respond_to?(event_name)
+
+      if method(event_name).arity == 1
+        send(event_name, value)
+      else
+        send(event_name)
       end
     end
 

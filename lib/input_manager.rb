@@ -77,17 +77,8 @@ module InputManager
       @action_maps ||= {}
     end
 
-    def register_action_map(name, action_map)
-      action_maps[name] = action_map
-    end
-
-    # Predefined control schemes
-    def keyboard
-      @keyboard ||= ControlScheme.new([:keyboard])
-    end
-
-    def keyboard_and_mouse
-      @keyboard_and_mouse ||= ControlScheme.new(%i[keyboard mouse])
+    def register_action_map(action_map)
+      action_maps[action_map.name] = action_map
     end
   end
 end

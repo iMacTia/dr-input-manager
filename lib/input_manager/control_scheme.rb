@@ -29,5 +29,34 @@ module InputManager
     def to_s
       input_devices.join(' + ')
     end
+
+    # Predefined control schemes
+    class << self
+      def keyboard
+        @keyboard ||= new([:keyboard])
+      end
+
+      def mouse
+        @mouse ||= new([:mouse])
+      end
+
+      def keyboard_and_mouse
+        @keyboard_and_mouse ||= new(%i[keyboard mouse])
+      end
+
+      def touch
+        @touch ||= new([:touch])
+      end
+
+      def controller(slot)
+        @controllers ||= {
+          one: new([:controller_one]),
+          two: new([:controller_two]),
+          three: new([:controller_three]),
+          four: new([:controller_four])
+        }
+        @controllers[slot] || raise('Invalid slot. Should be :one, :two, :three, or :four')
+      end
+    end
   end
 end

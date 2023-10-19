@@ -11,6 +11,22 @@ module InputManager
       @type = DEVICE_BINDINGS[input_device]
     end
 
+    def value_on(control_scheme)
+      devices = control_scheme.devices_for(input_device)
+
+      return false unless devices.any?
+
+      devices.each do |device|
+        input = $gtk.args.inputs.send(device)
+        input = input.send(modifier) if modifier
+        value = input.send(key)
+
+        return value if value && (!value.is_a?(Integer) || value != 0)
+      end
+
+      false
+    end
+
     def path
       @path ||= "#{input_device}/#{key}"
     end
@@ -21,21 +37,6 @@ module InputManager
         str += " (#{modifier})" if modifier
         str + " [#{input_device}]"
       end
-    end
-
-    def active_on?(control_scheme)
-      devices = control_scheme.devices_for(input_device)
-
-      return false unless devices.any?
-
-      devices.each do |device|
-        input = $gtk.args.inputs.send(device)
-        input = input.send(modifier) if modifier
-
-        return true if input.send(key)
-      end
-
-      false
     end
 
     private
