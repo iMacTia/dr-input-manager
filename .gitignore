@@ -1,0 +1,5 @@
+.DS_Store
+builds/
+logs/
+exceptions/
+smaug/
