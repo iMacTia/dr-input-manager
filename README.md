@@ -213,3 +213,19 @@ end
 # As we saw in the "Quick Start" above, this is ptional but useful.
 InputManager.register_action_map(gameplay_am)
 ```
+
+## Contribute
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/iMacTia/dr-input-manager. 
+
+### Required Checks
+
+Before pushing your code and opening a PR, we recommend you run the following checks to avoid our GitHub Actions Workflow to block your contribution.
+
+```bash
+# Run unit tests
+$ smaug run --test spec/spec_helper.rb --no-tick
+
+# Check code style
+$ bundle exec rubocop
+```
