@@ -50,7 +50,7 @@ module InputManager
 
     # Main method responsible for updating all controls and actions.
     def update
-      devices.each(&:update)
+      devices.select(&:enabled?).each(&:update)
       action_maps.select(&:enabled?).each(&:update)
     end
 

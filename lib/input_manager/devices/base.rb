@@ -7,6 +7,7 @@ module InputManager
       attr_reader :name
       # attribute [Hash<Controls::Base>] list of controls for the device.
       attr_reader :controls_registry
+      attr_accessor :enabled
 
       class << self
         def type
@@ -17,10 +18,15 @@ module InputManager
       def initialize(name)
         @name = name
         @controls_registry = {}
+        @enabled = true
       end
 
       def type
         self.class.type
+      end
+
+      def enabled?
+        !!@enabled
       end
 
       def get_raw_value(control_name)

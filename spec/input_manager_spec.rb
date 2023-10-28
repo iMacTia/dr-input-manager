@@ -67,4 +67,19 @@ spec InputManager do
       expect(InputManager.actions.first).to be_a(InputManager::Action)
     end
   end
+
+  spec '.update' do
+    before do
+      InputManager::Action.new(:test, bindings: [InputManager::Binding.new(:keyboard, :space)])
+    end
+
+    after do
+      InputManager.default_action_map.reset
+    end
+
+    it 'updates all enabled devices and actions' do |_args, assert|
+      InputManager.update
+      assert.ok!
+    end
+  end
 end
