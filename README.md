@@ -18,64 +18,47 @@ Copy the content of the `lib` folder in your project and require `input_manager.
 
 ## Quick Usage
 
-Let's just take a look at how you can use the `InputManager` to listen for input events.
-The idea is that you can create action maps and bindings, and then use these in your entities
-via the `InputComponent` helper.
+Let's just take a look at how you can use the `InputManager` to define *logical* input actions.
 
-`InputManager` allows you to define several action maps and control schemes, but let's keep things
-simple for now and assume there's only one action map that uses the `keyboard` control scheme.
+First, we need to make sure `InputManager` is enabled by calling its `.update` method in your game's tick:
 
-First, we define the action map with one action called "jump".
+```ruby
+def tick(args)
+  InputManager.update
+end
+```
+
+Next, we define an action called "jump" in one of our entities (in this example, the player).
 The action will be triggered by pressing the space bar on the keyboard (binding):
 
 ```ruby
-# We define a "Gameplay" action map, you can name it whatever you want.
-gameplay_am = InputManager::ActionMap.new('Gameplay')
-
-# Then, we register a "jump" action mapped to the spacebar key_down event.
-gameplay_am.register_action(:jump, [InputManager::Binding.new(:keyboard, :space, :key_down)])
-
-# It can be useful to register this action map with the `InputManager`, so that it can be reused.
-# It also makes it easy to reference it from other files.
-# They can be retrieved using their `name`, so make sure that's unique.
-InputManager.register_action_map(gameplay_am)
-```
-
-Now that your action map is defined, you can add an `InputComponent` to entities that should respond to input events.
-All you need to do is to:
-* Include the `InputManager::InputComponent` module
-* Specify the `@control_scheme` and `@action_map` instance variables
-* Define `on_<action_name>` listener methods (these will be called automatically when the corresponding action is triggered)
-* Make sure your object calls `process_input` on each tick
-
-```ruby
 class Player
-  include InputManager::InputComponent
-
   def initialize
-    # In order for InputComponent to do its magic, you need to specify a control_scheme and input_map
-    # for your entity instance. These are instance variables because you can re-map them on the go!
-    @control_scheme = InputManager::ControlScheme.keyboard
-    @action_map = InputManager.action_maps['Gameplay']
-  end
-
-  def tick
-    process_input # this is the magic bit that checks for inputs and calls listeners like `on_jump`
-  end
-
-  # This is a listener, they're conventionally called `on_<action_name>`
-  def on_jump
-    puts 'JUMP!'
+    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Binding.new(:keyboard, :space)])
   end
 end
 ```
 
-And that's it! Now if you run this on your main file, you will see "JUMP!" printed whenever you press the spacebar key.
+You can poll the action to know if it was `triggered` in the current frame:
+
+```ruby
+class Player
+  # ...
+
+  def tick(args)
+    puts 'JUMP!' if @jump_action.triggered?
+  end
+end
+```
+
+And that's it! Now if you run this on your main file, you will see "JUMP!" printed
+on the DR console whenever you press the spacebar key.
 
 ```ruby
 def tick args
   player ||= Player.new
-  player.tick
+  InputManager.update
+  player.tick # make sure you run your entity's "tick" after `InputManager.update`
 end
 ```
 

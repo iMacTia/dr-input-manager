@@ -2,29 +2,14 @@
 
 require 'lib/input_manager.rb'
 
-gameplay_am = InputManager::ActionMap.new('Gameplay')
-
-# Then, we register a "jump" action mapped to the spacebar key_down event.
-gameplay_am.register_action(:jump, [InputManager::Binding.new(:keyboard, :space, :key_down)])
-
-# It can be useful to register this action map with the `InputManager`, so that it can be reused.
-# It also makes it easy to reference it from other files.
-# They can be retrieved using their `name`, so make sure that's unique.
-InputManager.register_action_map(gameplay_am)
-
 class Player
-  include InputManager::InputComponent
-
   def initialize
-    # In order for InputComponent to do its magic, you need to specify a control_scheme and input_map
-    # for your entity instance. These are instance variables because you can re-map them on the go!
-    @control_scheme = InputManager::ControlScheme.keyboard
-    @action_map = InputManager.action_maps['Gameplay']
+    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Binding.new(:keyboard, :space)])
   end
 
   def tick(args)
     @args = args
-    process_input # this is the magic bit that checks for inputs and calls listeners like `on_jump`
+    on_jump if @jump_action.triggered?
 
     args.state.counter -= 1
     args.outputs.labels << [640, 360, 'JUMP!', 0] if args.state.counter >= 0
@@ -41,5 +26,6 @@ def tick(args)
   player ||= Player.new
   args.state.counter ||= 0
 
+  InputManager.update # this is the magic bit that checks for inputs and updates controls
   player.tick(args)
 end

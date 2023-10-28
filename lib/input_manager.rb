@@ -14,71 +14,57 @@
 # Components/Entities (e.g. Sprites) consume inputs by including the InputComponent module and
 # specifying the control scheme and action map to use.
 module InputManager
-  INPUT_DEVICES = %i[keyboard mouse touch controller_one controller_two controller_three controller_four].freeze
-
-  CONTROLLER_BINDINGS = {
-    buttons: %i[
-      up down left right a b x y
-      l1 r1 l2 r2 l3 r3 start select
-      directional_up directional_down directional_left directional_right
-    ],
-    values: %i[
-      left_right up_down
-      left_analog_x_raw right_analog_x_raw left_analog_y_raw right_analog_y_raw
-      left_analog_x_perc right_analog_x_perc left_analog_y_perc right_analog_y_perc
-    ]
-  }.freeze
-
-  KEYBOARD_BINDINGS = {
-    buttons: %i[
-      active up down left right
-      alt meta control shift exclamation_point
-      zero one two three four five six seven eight nine
-      backspace delete escape enter tab shift control alt meta
-      open_round_brace close_round_brace open_curly_brace close_curly_brace open_square_brace close_square_brace
-      colon semicolon equal_sign hyphen space dollar_sign double_quotation_mark single_quotation_mark
-      backtick tilde period comma pipe underscore
-      a b c d e f g h i j k l m n o p q r s t u v w x y z
-      pageup pagedown char plus at forward_slash back_slash asterisk less_than greater_than carat ampersand
-      superscript_two circumflex question_mark section_sign raw_key
-      ctrl_up ctrl_down ctrl_left ctrl_right
-      ctrl_zero ctrl_one ctrl_two ctrl_three ctrl_four ctrl_five ctrl_six ctrl_seven ctrl_eight ctrl_nine
-      ctrl_backtick ctrl_tilde ctrl_period ctrl_comma ctrl_pipe ctrl_underscore
-      ctrl_a ctrl_b ctrl_c ctrl_d ctrl_e ctrl_f ctrl_g ctrl_h ctrl_i ctrl_j ctrl_k ctrl_l ctrl_m
-      ctrl_n ctrl_o ctrl_p ctrl_q ctrl_r ctrl_s ctrl_t ctrl_u ctrl_v ctrl_w ctrl_x ctrl_y ctrl_z
-      ctrl_pageup ctrl_pagedown ctrl_char ctrl_plus ctrl_at ctrl_carat ctrl_ampersand ctrl_circumflex
-    ],
-    values: %i[
-      left_right up_down directional_vector truthy_keys ordinal_indicator
-    ]
-  }.freeze
-
-  MOUSE_BINDINGS = {
-    buttons: %i[button_left button_middle button_right moved],
-    values: %i[x y button_bits wheel click down previous_click up]
-  }.freeze
-
-  TOUCH_BINDINGS = {
-    buttons: [],
-    values: %i[touch finger_left finger_right]
-  }.freeze
-
-  DEVICE_BINDINGS = {
-    controller: CONTROLLER_BINDINGS,
-    keyboard: KEYBOARD_BINDINGS,
-    mouse: MOUSE_BINDINGS,
-    touch: TOUCH_BINDINGS
-  }.freeze
-
-  BINDING_MODIFIERS = %i[key_down key_held key_up].freeze
-
   class << self
-    def action_maps
-      @action_maps ||= {}
+    def devices_registry
+      @devices_registry ||= {
+        mouse: Devices::Mouse.new(:mouse),
+        keyboard: Devices::Keyboard.new(:keyboard),
+        touch: Devices::Touch.new(:touch),
+        controller_one: Devices::Controller.new(:controller_one),
+        controller_two: Devices::Controller.new(:controller_two),
+        controller_three: Devices::Controller.new(:controller_three),
+        controller_four: Devices::Controller.new(:controller_four)
+      }
+    end
+
+    def devices
+      @devices ||= devices_registry.values
+    end
+
+    def action_maps_registry
+      @action_maps_registry ||= default_action_maps_registry
     end
 
     def register_action_map(action_map)
-      action_maps[action_map.name] = action_map
+      action_maps_registry[action_map.name] = action_map
+      @action_maps = nil
+    end
+
+    def action_maps
+      @action_maps ||= action_maps_registry.values
+    end
+
+    def actions
+      action_maps.flat_map(&:actions)
+    end
+
+    # Main method responsible for updating all controls and actions.
+    def update
+      devices.each(&:update)
+      action_maps.select(&:enabled?).each(&:update)
+    end
+
+    def reset_action_maps_registry
+      @default_action_map = nil
+      @action_maps_registry = nil
+    end
+
+    def default_action_maps_registry
+      { default: default_action_map }
+    end
+
+    def default_action_map
+      @default_action_map ||= ActionMap.new(:default)
     end
   end
 end
@@ -88,3 +74,5 @@ require_relative 'input_manager/action'
 require_relative 'input_manager/binding'
 require_relative 'input_manager/control_scheme'
 require_relative 'input_manager/input_component'
+require_relative 'input_manager/devices'
+require_relative 'input_manager/controls'

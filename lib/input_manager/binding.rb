@@ -2,49 +2,55 @@
 
 module InputManager
   class Binding
-    attr_reader :input_device, :type, :key, :modifier
+    # attribute [Symbol] the type of device to which this binding applies.
+    attr_reader :device_type
+    # attribute [Symbol] the key (button/control) to listen to.
+    attr_reader :key
+    # attribute [Action] the action to which this binding is registered.
+    attr_accessor :action
+    # attribute [Array<Interaction>] list of interactions to put on the binding.
+    attr_reader :interactions
 
-    def initialize(input_device, key, modifier = nil)
-      @input_device = input_device
+    def initialize(device_type, key, action: nil, interactions: [])
+      @device_type = device_type
       @key = key
-      @modifier = modifier
-      @type = DEVICE_BINDINGS[input_device]
+      @action = action
+      @interactions = interactions
     end
 
-    def value_on(control_scheme)
-      devices = control_scheme.devices_for(input_device)
+    def resolvable?
+      !action.nil?
+    end
 
-      return false unless devices.any?
+    def resolve
+      return unless resolvable?
 
-      devices.each do |device|
-        input = $gtk.args.inputs.send(device)
-        input = input.send(modifier) if modifier
-        value = input.send(key)
-
-        return value if value && (!value.is_a?(Integer) || value != 0)
+      matching = action.controls.select { |control| valid_for?(control) }
+      if matching.size < 2
+        matching.first
+      else
+        matching.max_by(&:value)
       end
+    end
 
-      false
+    def valid_for?(control)
+      !action.action_map.consumed?(control) && control.pressed? && matches?(control)
+    end
+
+    def matches?(control)
+      control.device.type == device_type && key == control.name
     end
 
     def path
-      @path ||= "#{input_device}/#{key}"
+      @path ||= "#{device_type}/#{key}"
+    end
+
+    def complexity
+      1
     end
 
     def to_s
-      @to_s ||= begin
-        str = "#{key}"
-        str += " (#{modifier})" if modifier
-        str + " [#{input_device}]"
-      end
-    end
-
-    private
-
-    def detect_type
-      return :value if DEVICE_BINDINGS[input_device][:values].include?(key)
-
-      :button
+      path
     end
   end
 end
