@@ -1,4 +1,6 @@
-require "smaug/dr_spec/lib/dr_spec/dragon_specs"
+# frozen_string_literal: true
+
+require 'smaug/dr_spec/lib/dr_spec/dragon_specs'
 
 $gtk.reset(100)
 
@@ -16,7 +18,7 @@ def require_specs(current_dir = 'spec')
   end
 end
 
-alias :be_a :be_kind_of
+alias be_a be_kind_of
 
-require_specs 
-puts "running tests"
+require_specs
+puts 'running tests'

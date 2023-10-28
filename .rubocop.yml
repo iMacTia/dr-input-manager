@@ -1,2 +1,17 @@
+AllCops:
+  Exclude:
+    - smaug/**/*
+
+Style/Documentation:
+  Enabled: false
+Style/GlobalVars:
+  Enabled: false
 Style/RedundantFileExtensionInRequire:
   Enabled: false
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*

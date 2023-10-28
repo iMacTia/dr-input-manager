@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 spec InputManager do
   spec '.devices_registry' do
     it 'contains a hash of all the devices' do
@@ -36,7 +38,7 @@ spec InputManager do
     it 'registers the action map in the registry' do
       test_am = InputManager::ActionMap.new(:test)
       InputManager.register_action_map(test_am)
-      
+
       expect(InputManager.action_maps_registry.size).to eq(2)
       expect(InputManager.action_maps_registry[:test]).to eq(test_am)
     end
