@@ -33,9 +33,7 @@ module InputManager
     # @param action [String, Action] the action to register or its name
     # @param bindings [Array<Binding>] the bindings for this action. Optional, defaults to [].
     def register_action(action, bindings = [])
-      if action.is_a?(String) || action.is_a?(Symbol)
-        action = Action.new(action.to_s, bindings: bindings, action_map: self)
-      end
+      action = Action.new(action, bindings: bindings, action_map: self) if action.is_a?(String) || action.is_a?(Symbol)
       actions_registry[action.name] = action
       action.action_map = self
       @actions = nil

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 spec InputManager do
-  spec '.devices_registry' do
+  context '.devices_registry' do
     it 'contains a hash of all the devices' do
       expect(InputManager.devices_registry).to be_a(Hash)
     end
@@ -12,7 +12,7 @@ spec InputManager do
     end
   end
 
-  spec '.devices' do
+  context '.devices' do
     it 'returns a list of devices' do
       expect(InputManager.devices).to be_a(Array)
       expect(InputManager.devices.size).to eq(7)
@@ -20,7 +20,7 @@ spec InputManager do
     end
   end
 
-  spec '.devices_registry' do
+  context '.devices_registry' do
     it 'contains a hash of all the action maps' do
       expect(InputManager.action_maps_registry).to be_a(Hash)
     end
@@ -30,7 +30,7 @@ spec InputManager do
     end
   end
 
-  spec '.register_action_map' do
+  context '.register_action_map' do
     after do
       InputManager.reset_action_maps_registry
     end
@@ -44,7 +44,7 @@ spec InputManager do
     end
   end
 
-  spec '.action_maps' do
+  context '.action_maps' do
     it 'returns a list of action_maps' do
       expect(InputManager.action_maps).to be_a(Array)
       expect(InputManager.action_maps.size).to eq(1)
@@ -52,7 +52,7 @@ spec InputManager do
     end
   end
 
-  spec '.actions' do
+  context '.actions' do
     before do
       InputManager::Action.new(:test)
     end
@@ -68,7 +68,7 @@ spec InputManager do
     end
   end
 
-  spec '.update' do
+  context '.update' do
     before do
       InputManager::Action.new(:test, bindings: [InputManager::Binding.new(:keyboard, :space)])
     end

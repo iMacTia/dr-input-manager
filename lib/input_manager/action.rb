@@ -9,14 +9,14 @@ module InputManager
     attr_reader :phase
     attr_accessor :action_map, :active_control, :enabled
 
-    def initialize(name, type: :button, control_type: nil, bindings: [], action_map: nil)
+    def initialize(name, type: :button, control_type: nil, bindings: [], action_map: nil, orphan: false)
       @name = name
       @type = type
       @control_type = control_type
       @bindings = []
       bindings.each { |b| add_binding(b) }
 
-      unless action_map
+      unless orphan || action_map
         action_map = InputManager.default_action_map
         action_map.register_action(self)
       end
