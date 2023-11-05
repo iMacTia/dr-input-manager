@@ -22,7 +22,7 @@ dr_spec = "/Users/mgiuffrida/Development/levaleureux/dr_spec"
 # "lib/library.rb" = "app/lib/library.rb"
 
 [dragonruby]
-version = "5.9"
+version = "5.10"
 edition = "standard"
 
 ## TEST APP Section
