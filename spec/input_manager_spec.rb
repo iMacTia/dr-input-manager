@@ -70,7 +70,7 @@ spec InputManager do
 
   context '.update' do
     before do
-      InputManager::Action.new(:test, bindings: [InputManager::Binding.new(:keyboard, :space)])
+      InputManager::Action.new(:test, bindings: [InputManager::Bindings::Simple.new(:keyboard, :space)])
     end
 
     after do

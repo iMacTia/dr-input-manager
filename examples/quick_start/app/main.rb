@@ -4,7 +4,7 @@ require 'lib/input_manager.rb'
 
 class Player
   def initialize
-    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Binding.new(:keyboard, :space)])
+    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Bindings::Simple.new(:keyboard, :space)])
   end
 
   def tick(args)

@@ -71,7 +71,7 @@ end
 
 require_relative 'input_manager/action_map'
 require_relative 'input_manager/action'
-require_relative 'input_manager/binding'
+require_relative 'input_manager/bindings'
 require_relative 'input_manager/control_scheme'
 require_relative 'input_manager/input_component'
 require_relative 'input_manager/devices'

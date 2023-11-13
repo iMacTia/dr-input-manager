@@ -34,7 +34,7 @@ The action will be triggered by pressing the space bar on the keyboard (binding)
 ```ruby
 class Player
   def initialize
-    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Binding.new(:keyboard, :space)])
+    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Bindings::Base.new(:keyboard, :space)])
   end
 end
 ```
@@ -114,14 +114,14 @@ providing a state/modifier as well.
 ```ruby
 # Example without a modifier.
 # Returns true if up is pressed or held on the directional
-binding = Binding.new(
+binding = Bindings::Base.new(
   :keyboard, # input device
   :directional_up # key/button
 )
 
 # Example with modifier.
 # Returns true if the A button on a controller was pressed on this frame.
-binding = Binding.new(
+binding = Bindings::Base.new(
   :controller, # input device. Note how we don't need to specify the controller number, that's a concern for the scheme.
   :a, # key/button
   :key_down # modifier
@@ -154,7 +154,7 @@ Each action has a name and one or more `Binding`s associated with it to define h
 ```ruby
 jump = InputManager::Action.new(
   :select, # the name of the action
-  [Binding.new(:keyboard, :enter, :key_down)] # the list of bindings that trigger the action
+  [Bindings::Base.new(:keyboard, :enter, :key_down)] # the list of bindings that trigger the action
 )
 ```
 
@@ -167,8 +167,8 @@ either the spacebar on the keyboard or the A button on a controller.
 jump = InputManager::Action.new(
   :jump, # the name of the action
   [
-    Binding.new(:keyboard, :space, :key_down),
-    Binding.new(:controller, :a, :key_down)
+    Bindings::Base.new(:keyboard, :space, :key_down),
+    Bindings::Base.new(:controller, :a, :key_down)
   ]
 )
 ```
@@ -188,8 +188,8 @@ To define a composite binding you can pass an array of bindings to the action:
 left_click = InputManager::Action.new(
   :left_click, # the name of the action
   [
-    Binding.new(:mouse, :click),
-    Binding.new(:mouse, :button_left)
+    Bindings::Base.new(:mouse, :click),
+    Bindings::Base.new(:mouse, :button_left)
   ]
 )
 ```
@@ -206,8 +206,8 @@ separate ActionMaps for "Explore", "Vehicle", "Combat" modes so bindings don't c
 
 ```ruby
 gameplay_am = InputManager::ActionMap.new('Gameplay').tap |am|
-  am.register_action(:jump, [InputManager::Binding.new(:keyboard, :space, :key_down)])
-  am.register_action(:fire, [InputManager::Binding.new(:mouse, :click)])
+  am.register_action(:jump, [InputManager::Bindings::Base.new(:keyboard, :space, :key_down)])
+  am.register_action(:fire, [InputManager::Bindings::Base.new(:mouse, :click)])
 end
 
 # As we saw in the "Quick Start" above, this is ptional but useful.
