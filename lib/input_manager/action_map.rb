@@ -51,6 +51,7 @@ module InputManager
 
         @consumed_controls << control
         binding.action.active_control = control
+        binding.action.active_binding = binding
       end
 
       actions.each(&:update)

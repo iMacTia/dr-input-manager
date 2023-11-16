@@ -36,7 +36,6 @@ spec InputManager::ActionMap do
       end
 
       it 'register the action in the actions_registry' do
-        puts "IT: #{@action}"
         expect(@action_map.actions_registry[:test]).to eq(@action)
       end
 

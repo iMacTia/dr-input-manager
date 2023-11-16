@@ -7,7 +7,7 @@ module InputManager
     def process_input
       return unless action_map
 
-      action_map.actions.values.each do |action|
+      action_map.actions.each_value do |action|
         process_action(action)
       end
     end

@@ -10,15 +10,21 @@ module InputManager
       # attribute [Action] the action to which this binding is registered.
       attr_accessor :action
 
-      def initialize(device_type, key, action: nil, interactions: nil)
+      def initialize(device_type, key, action: nil, interactions: [])
         @device_type = device_type
         @key = key
         @action = action
-        @interactions = interactions
+        @interactions = []
+        interactions.each { |i| add_interaction(i) }
       end
 
       def interactions
-        @interactions || action&.interactions || []
+        @interactions + (action&.interactions || [])
+      end
+
+      def add_interaction(interaction)
+        interaction.binding = self
+        @interactions << interaction
       end
 
       def resolvable?

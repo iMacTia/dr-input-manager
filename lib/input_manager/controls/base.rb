@@ -37,7 +37,11 @@ module InputManager
       end
 
       def pressed_this_frame?
-        pressed? && (@current_value != @previous_value)
+        pressed? && changed?
+      end
+
+      def changed?
+        @current_value != @previous_value
       end
 
       def value
@@ -46,6 +50,10 @@ module InputManager
 
       def pressed?
         @current_value != @default_value
+      end
+
+      def display_name
+        "#{device.name}.#{name}"
       end
     end
   end

@@ -4,17 +4,21 @@ module InputManager
   class Action
     TYPES = %i[value button].freeze
 
-    attr_reader :name, :type, :control_type, :bindings
+    attr_reader :name, :type, :control_type, :bindings, :interactions
     # attribute [Symbol] either :started, :performed or :cancelled
     attr_reader :phase
-    attr_accessor :action_map, :active_control, :enabled
+    attr_accessor :action_map, :active_control, :active_binding, :active_interaction, :enabled
 
-    def initialize(name, type: :button, control_type: nil, bindings: [], action_map: nil, orphan: false)
+    def initialize(name, type: :button, control_type: nil,
+                   action_map: nil, orphan: false,
+                   bindings: [], interactions: [InputManager::Interactions.default_interaction])
       @name = name
       @type = type
       @control_type = control_type
       @bindings = []
+      @interactions = []
       bindings.each { |b| add_binding(b) }
+      interactions.each { |i| add_interaction(i) }
 
       unless orphan || action_map
         action_map = InputManager.default_action_map
@@ -43,15 +47,53 @@ module InputManager
       @bindings << binding
     end
 
+    def add_interaction(interaction)
+      interaction.action = self
+      @interactions << interaction
+    end
+
     # This method is called after bindings have been resolved to update the action.
     def update
       return unless @active_control
 
-      @performed_this_frame = @active_control.pressed_this_frame?
+      @all_interactions = @active_binding.interactions
+      @all_interactions.each { |i| i.update(@active_control) }
+      @active_interaction = find_active_interaction
+
+      return unless @active_interaction
+
+      @phase = @active_interaction.phase
+      @performed_this_frame = active_interaction&.performed_this_frame?
+    end
+
+    def find_active_interaction
+      active_interaction = @all_interactions.find { |i| i.started? || i.performed? }
+      active_interaction ||= @all_interactions.find(&:cancelled?)
+      active_interaction
     end
 
     def value
       @active_control&.value
+    end
+
+    def started?
+      @active_interaction&.started? || false
+    end
+
+    def performed?
+      @active_interaction&.performed? || false
+    end
+
+    def performed_this_frame?
+      @active_interaction&.performed_this_frame? || false
+    end
+
+    def triggered?
+      performed_this_frame?
+    end
+
+    def cancelled?
+      @active_interaction&.cancelled? || false
     end
 
     def controls
@@ -66,15 +108,17 @@ module InputManager
       @bindings = []
     end
 
-    def triggered?
-      @performed_this_frame
+    def reset_interactions
+      @interactions = []
     end
 
     def clone(new_action_map)
       cloned = super()
       cloned.action_map = new_action_map
       cloned.reset_bindings
+      cloned.reset_interactions
       bindings.each { |b| cloned.add_binding(b) }
+      interactions.each { |i| cloned.add_interaction(i) }
       cloned
     end
   end

@@ -1,5 +1,6 @@
 AllCops:
   Exclude:
+    - smaug.rb
     - smaug/**/*
 
 Style/Documentation:
@@ -9,9 +10,10 @@ Style/GlobalVars:
 Style/RedundantFileExtensionInRequire:
   Enabled: false
 
-Metrics/MethodLength:
-  Max: 15
-
 Metrics/BlockLength:
   Exclude:
     - spec/**/*
+Metrics/MethodLength:
+  Max: 15
+Metrics/ParameterLists:
+  Enabled: false
