@@ -44,21 +44,15 @@ module InputManager
     end
 
     def update
-      @consumed_controls = []
       bindings.each do |binding|
         control = binding.resolve
         next unless control
 
-        @consumed_controls << control
         binding.action.active_control = control
         binding.action.active_binding = binding
       end
 
       actions.each(&:update)
-    end
-
-    def consumed?(control)
-      @consumed_controls.include?(control)
     end
 
     def bindings

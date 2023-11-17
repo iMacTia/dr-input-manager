@@ -11,12 +11,13 @@ module InputManager
 
     def initialize(name, type: :button, control_type: nil,
                    action_map: nil, orphan: false,
-                   bindings: [], interactions: [InputManager::Interactions.default_interaction])
+                   bindings: [], interactions: [])
       @name = name
       @type = type
       @control_type = control_type
       @bindings = []
       @interactions = []
+      @default_interaction = InputManager::Interactions.default_interaction.tap { |i| i.action = self }
       bindings.each { |b| add_binding(b) }
       interactions.each { |i| add_interaction(i) }
 
@@ -56,7 +57,7 @@ module InputManager
     def update
       return unless @active_control
 
-      @all_interactions = @active_binding.interactions
+      @all_interactions = find_all_interactions
       @all_interactions.each { |i| i.update(@active_control) }
       @active_interaction = find_active_interaction
 
@@ -64,6 +65,12 @@ module InputManager
 
       @phase = @active_interaction.phase
       @performed_this_frame = active_interaction&.performed_this_frame?
+    end
+
+    def find_all_interactions
+      all_interactions = @active_binding.interactions + interactions
+      all_interactions << @default_interaction if all_interactions.empty?
+      all_interactions
     end
 
     def find_active_interaction

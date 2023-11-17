@@ -9,6 +9,8 @@ module InputManager
       attr_reader :key
       # attribute [Action] the action to which this binding is registered.
       attr_accessor :action
+      # attribute [Array<InputManager::Interaction>] the list of interactions for this binding.
+      attr_reader :interactions
 
       def initialize(device_type, key, action: nil, interactions: [])
         @device_type = device_type
@@ -16,10 +18,6 @@ module InputManager
         @action = action
         @interactions = []
         interactions.each { |i| add_interaction(i) }
-      end
-
-      def interactions
-        @interactions + (action&.interactions || [])
       end
 
       def add_interaction(interaction)
@@ -43,7 +41,7 @@ module InputManager
       end
 
       def valid_for?(control)
-        !action.action_map.consumed?(control) && control.pressed? && matches?(control)
+        control.pressed? && matches?(control)
       end
 
       def matches?(control)
