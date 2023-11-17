@@ -2,19 +2,19 @@
 
 module InputManager
   module Interactions
-    class Tap < Base
+    class Hold < Base
       attr_reader :duration
 
       def initialize(action: nil, binding: nil, duration: nil)
         super(action: action, binding: binding)
-        @duration = duration || 0.2
+        @duration = duration || 1.0
       end
 
       def process
         if pressed?
-          cancel if press_time > duration
-        elsif press_time <= duration
-          perform
+          perform if started? && press_time >= duration
+        else
+          cancel
         end
       end
     end

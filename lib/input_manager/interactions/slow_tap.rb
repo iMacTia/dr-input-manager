@@ -2,7 +2,7 @@
 
 module InputManager
   module Interactions
-    class Tap < Base
+    class SlowTap < Base
       attr_reader :duration
 
       def initialize(action: nil, binding: nil, duration: nil)
@@ -11,11 +11,9 @@ module InputManager
       end
 
       def process
-        if pressed?
-          cancel if press_time > duration
-        elsif press_time <= duration
-          perform
-        end
+        return unless started? && released?
+
+        press_time >= duration ? perform : cancel
       end
     end
   end

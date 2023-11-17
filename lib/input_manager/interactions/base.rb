@@ -4,8 +4,9 @@ module InputManager
   module Interactions
     # Abstract base class for all interactions
     class Base
-      attr_reader :state, :phase, :previous_phase, :current_control, :binding,
+      attr_reader :state, :phase, :previous_phase, :current_control,
                   :pressed_at, :started_at, :performed_at, :cancelled_at
+      attr_accessor :binding
       attr_writer :action
 
       def initialize(action: nil, binding: nil)
@@ -50,6 +51,7 @@ module InputManager
         @current_control = control
         @state = :processing
         @pressed_at = Time.now
+        start
       end
 
       def processing?
@@ -58,6 +60,10 @@ module InputManager
 
       def pressed?
         processing? && current_control.pressed?
+      end
+
+      def released?
+        processing? && !current_control.pressed?
       end
 
       def press_time
@@ -101,7 +107,11 @@ module InputManager
       end
 
       def update_state
-        @state = :idle if !current_control.pressed? && @phase == :cancelled || @phase == :performed
+        @state = :idle if released? && can_reset?
+      end
+
+      def can_reset?
+        @phase == :cancelled || @phase == :performed
       end
 
       # TODO: fire events for event-driven API
