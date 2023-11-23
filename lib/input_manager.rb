@@ -27,8 +27,21 @@ module InputManager
       }
     end
 
+    def timeouts
+      @timeouts ||= {}
+    end
+
     def devices
       @devices ||= devices_registry.values
+    end
+
+    def set_timeout(duration, &block)
+      timeout = Timeout.new(duration, &block)
+      timeouts[timeout.key] = timeout
+    end
+
+    def remove_timeout(timeout)
+      timeouts.delete(timeout.key)
     end
 
     def action_maps_registry
@@ -50,6 +63,7 @@ module InputManager
 
     # Main method responsible for updating all controls and actions.
     def update
+      timeouts.each_value(&:update)
       devices.select(&:enabled?).each(&:update)
       action_maps.select(&:enabled?).each(&:update)
     end
@@ -69,6 +83,7 @@ module InputManager
   end
 end
 
+require_relative 'input_manager/timeout'
 require_relative 'input_manager/action_map'
 require_relative 'input_manager/action'
 require_relative 'input_manager/bindings'
