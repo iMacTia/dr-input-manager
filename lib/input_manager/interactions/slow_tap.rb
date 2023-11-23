@@ -10,6 +10,10 @@ module InputManager
         @duration = duration || 0.2
       end
 
+      def slow_tap?
+        true
+      end
+
       def process
         return unless started? && released?
 
