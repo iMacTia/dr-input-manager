@@ -10,8 +10,9 @@ module InputManager
       attr_reader :device
       # attribute [Proc] proc to apply to value.
       attr_reader :processor
+
       # attribute [Object] default value for the control. Used to determine if the control is actuated.
-      attr_accessor :default_value
+      attr_writer :default_value
 
       def initialize(name, device, &block)
         @name = name
@@ -22,6 +23,10 @@ module InputManager
       end
 
       def setup; end
+
+      def default_value
+        @default_value ||= self.class.default_value
+      end
 
       def default_processor
         proc { |val| val }
@@ -49,7 +54,7 @@ module InputManager
       end
 
       def pressed?
-        @current_value != @default_value
+        @current_value != default_value
       end
 
       def display_name

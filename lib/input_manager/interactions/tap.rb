@@ -10,7 +10,13 @@ module InputManager
         @duration = duration || 0.2
       end
 
+      def tap?
+        true
+      end
+
       def process
+        return unless started?
+
         if pressed?
           cancel if press_time > duration
         elsif press_time <= duration

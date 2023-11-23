@@ -27,6 +27,10 @@ module InputManager
           }
         )
       end
+
+      def has_focus # rubocop:disable Naming/PredicateName
+        get_raw_value(:has_focus)
+      end
     end
   end
 end

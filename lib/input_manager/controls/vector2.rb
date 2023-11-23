@@ -3,8 +3,8 @@
 module InputManager
   module Controls
     class Vector2 < Base
-      def setup
-        @default_value = [0, 0]
+      def self.default_value
+        [0, 0]
       end
 
       def default_processor

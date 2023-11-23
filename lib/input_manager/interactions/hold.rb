@@ -10,6 +10,10 @@ module InputManager
         @duration = duration || 1.0
       end
 
+      def hold?
+        true
+      end
+
       def process
         if pressed?
           perform if started? && press_time >= duration

@@ -12,6 +12,10 @@ module InputManager
         @behaviour = behaviour || :press_only
       end
 
+      def press?
+        true
+      end
+
       def process
         if pressed?
           perform if started? && on_press?
@@ -19,11 +23,6 @@ module InputManager
           perform if on_release? && (started? || performed?)
           cancel
         end
-      end
-
-      def perform
-        super
-        puts 'performed'
       end
 
       def on_press?

@@ -3,8 +3,8 @@
 module InputManager
   module Controls
     class Button < Base
-      def setup
-        @default_value = false
+      def self.default_value
+        false
       end
 
       def default_processor
