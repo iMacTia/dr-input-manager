@@ -5,7 +5,7 @@ module InputManager
     # Abstract base class for all interactions
     class Base
       attr_reader :state, :phase, :previous_phase, :current_control,
-                  :pressed_at, :started_at, :performed_at, :cancelled_at
+                  :pressed_at, :started_at, :performed_at, :cancelled_at, :fired_events
       attr_accessor :binding
       attr_writer :action
 
@@ -22,7 +22,7 @@ module InputManager
         @started_at = nil
         @performed_at = nil
         @cancelled_at = nil
-        # @events_queue = []
+        @fired_events = []
       end
 
       def action
@@ -30,7 +30,7 @@ module InputManager
       end
 
       def update(control)
-        # @events_queue = []
+        @fired_events = []
         @previous_phase = @phase
 
         if processing?
@@ -79,7 +79,7 @@ module InputManager
       def start
         @phase = :started
         @started_at = Time.now
-        # @events_queue << :started
+        @fired_events << :started
       end
 
       def performed?
@@ -93,7 +93,7 @@ module InputManager
       def perform
         @phase = :performed
         @performed_at = Time.now
-        # @events_queue << :performed
+        @fired_events << :performed
       end
 
       def cancelled?
@@ -103,7 +103,7 @@ module InputManager
       def cancel
         @phase = :cancelled
         @cancelled_at = Time.now
-        # @events_queue << :cancelled
+        @fired_events << :cancelled
       end
 
       def update_state
@@ -114,11 +114,20 @@ module InputManager
         @phase == :cancelled || @phase == :performed
       end
 
-      # TODO: fire events for event-driven API
-      def fire_events
-        @events_queue.each do |event|
-          action.process_event(event, interaction)
-        end
+      def tap?
+        false
+      end
+
+      def slow_tap?
+        false
+      end
+
+      def press?
+        false
+      end
+
+      def hold?
+        false
       end
     end
   end

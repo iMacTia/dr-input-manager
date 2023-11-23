@@ -4,7 +4,7 @@ module InputManager
   class Action
     TYPES = %i[value button].freeze
 
-    attr_reader :name, :type, :control_type, :bindings, :interactions
+    attr_reader :name, :type, :control_type, :bindings, :interactions, :callbacks
     # attribute [Symbol] either :started, :performed or :cancelled
     attr_reader :phase
     attr_accessor :action_map, :active_control, :active_binding, :active_interaction, :enabled
@@ -15,6 +15,7 @@ module InputManager
       @name = name
       @type = type
       @control_type = control_type
+      @callbacks = Hash.new { |h, k| h[k] = [] }
       @bindings = []
       @interactions = []
       @default_interaction = InputManager::Interactions.default_interaction.tap { |i| i.action = self }
@@ -65,6 +66,7 @@ module InputManager
 
       @phase = @active_interaction.phase
       @performed_this_frame = active_interaction&.performed_this_frame?
+      process_events
     end
 
     def find_all_interactions
@@ -79,8 +81,17 @@ module InputManager
       active_interaction
     end
 
+    def process_events
+      @all_interactions.each do |interaction|
+        interaction.fired_events.each do |event|
+          callbacks[event].each { |callback| callback.call(interaction, @active_control) }
+          action_map.trigger_event(event, self)
+        end
+      end
+    end
+
     def value
-      @active_control&.value
+      @active_control&.value || controls.first&.default_value || 0
     end
 
     def started?
@@ -117,6 +128,18 @@ module InputManager
 
     def reset_interactions
       @interactions = []
+    end
+
+    def started
+      callbacks[:started]
+    end
+
+    def performed
+      callbacks[:performed]
+    end
+
+    def cancelled
+      callbacks[:cancelled]
     end
 
     def clone(new_action_map)

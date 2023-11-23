@@ -2,7 +2,7 @@
 
 module InputManager
   class ActionMap
-    attr_reader :name, :actions_registry
+    attr_reader :name, :actions_registry, :callbacks
     attr_accessor :enabled
 
     def initialize(name)
@@ -12,6 +12,7 @@ module InputManager
 
     def reset
       @actions_registry = {}
+      @callbacks = Hash.new { |h, k| h[k] = [] }
       @enabled = true
       @actions = nil
       @devices = nil
@@ -53,6 +54,14 @@ module InputManager
       end
 
       actions.each(&:update)
+    end
+
+    def trigger_event(event, action)
+      callbacks[:action_triggered].each { |callback| callback.call(event, action) }
+    end
+
+    def action_triggered
+      callbacks[:action_triggered]
     end
 
     def bindings
