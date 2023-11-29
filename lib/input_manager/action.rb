@@ -45,11 +45,13 @@ module InputManager
     end
 
     def add_binding(binding)
+      binding = InputManager::Bindings.parse(binding)
       binding.action = self
       @bindings << binding
     end
 
     def add_interaction(interaction)
+      interaction = InputManager::Interactions.parse(interaction)
       interaction.action = self
       @interactions << interaction
     end

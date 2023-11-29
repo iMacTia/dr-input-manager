@@ -7,7 +7,7 @@ module InputManager
 
       def initialize(action: nil, binding: nil, duration: nil)
         super(action: action, binding: binding)
-        @duration = duration || 0.2
+        @duration = duration.to_f || 0.2
       end
 
       def slow_tap?

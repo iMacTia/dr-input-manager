@@ -7,7 +7,7 @@ module InputManager
 
       def initialize(action: nil, binding: nil, duration: nil)
         super(action: action, binding: binding)
-        @duration = duration || 1.0
+        @duration = duration.to_f || 1.0
       end
 
       def hold?
