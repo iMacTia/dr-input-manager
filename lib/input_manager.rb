@@ -71,6 +71,7 @@ module InputManager
     def reset_action_maps_registry
       @default_action_map = nil
       @action_maps_registry = nil
+      @action_maps = nil
     end
 
     def default_action_maps_registry
