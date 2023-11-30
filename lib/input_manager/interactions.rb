@@ -20,7 +20,6 @@ module InputManager
       klass = Object.const_get("InputManager::Interactions::#{to_klass(type)}")
       kwargs = parse_params(params)
 
-      puts kwargs
       klass.new(**kwargs)
     end
 
