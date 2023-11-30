@@ -6,13 +6,8 @@ class ChargedAttackScene
 
     @attack_action = InputManager::Action.new(
       :press,
-      bindings: [
-        InputManager::Bindings::Simple.new(:keyboard, :space)
-      ],
-      interactions: [
-        InputManager::Interactions::Tap.new(duration: threshold),
-        InputManager::Interactions::SlowTap.new(duration: threshold)
-      ]
+      bindings: 'keyboard/space;keyboard/a',
+      interactions: "tap(duration=#{threshold});slow_tap(duration=#{threshold})"
     )
 
     @attack_action.performed << method(:on_performed)

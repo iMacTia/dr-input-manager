@@ -12,27 +12,24 @@ class InteractionsScene
   attr_reader :jump_action
 
   def initialize
-    @press_action = InputManager::Action.new(
-      :press,
-      bindings: [InputManager::Bindings::Simple.new(:keyboard, :space)]
-    )
+    @press_action = InputManager::Action.new(:press, bindings: 'keyboard/space')
 
     @hold_action = InputManager::Action.new(
       :hold,
-      bindings: [InputManager::Bindings::Simple.new(:keyboard, :space)],
-      interactions: [InputManager::Interactions::Hold.new]
+      bindings: 'keyboard/space',
+      interactions: 'hold'
     )
 
     @tap_action = InputManager::Action.new(
       :tap,
-      bindings: [InputManager::Bindings::Simple.new(:keyboard, :space)],
-      interactions: [InputManager::Interactions::Tap.new]
+      bindings: 'keyboard/space',
+      interactions: 'tap'
     )
 
     @slow_tap_action = InputManager::Action.new(
       :slow_tap,
-      bindings: [InputManager::Bindings::Simple.new(:keyboard, :space)],
-      interactions: [InputManager::Interactions::SlowTap.new]
+      bindings: 'keyboard/space',
+      interactions: 'slow_tap'
     )
   end
 

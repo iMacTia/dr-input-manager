@@ -34,7 +34,7 @@ The action will be triggered by pressing the space bar on the keyboard (binding)
 ```ruby
 class Player
   def initialize
-    @jump_action = InputManager::Action.new(:jump, bindings: [InputManager::Bindings::Base.new(:keyboard, :space)])
+    @jump_action = InputManager::Action.new(:jump, bindings: 'keyboard/space')
   end
 end
 ```
@@ -72,35 +72,12 @@ If you don't use `smaug` you can copy the example folder next to your `dragonrub
 
 Now that we've seen it in action, let's dive deeper into how the Input Manager works under the hood.
 The Input Manager introduces 4 core components:
-1. Control Scheme - Represents one or more input devices bound together under a scheme (e.g. Keyboard, Gamepad).
-2. Action - Represents an input event that can be triggered (e.g. Jump, Shoot).
-3. Binding - Represents a button/key/input and it's state.
-4. ActionMap - Groups Actions and their Bindings together.
+1. Action - Represents an input event that can be triggered (e.g. Jump, Shoot).
+2. Binding - Represents a button/key/input and it's state.
+3. Interactions - Represents how the player interacts with the inputs.
+4. ActionMap - Groups Actions and their Bindings/Interactions together.
 
 Let's take a closer look at each of them.
-
-### Control Scheme
-
-This represents an input device or combination of devices that can be used for input.
-
-If you're wondering why you'd ever need to use a combination of devices, think about the classic "keyboard and mouse"
-control scheme that we're used to for FPS games, where the keyboard is used for movement and actions,
-while the mouse controls camera look. Another example could be combining a gamepad with motion controls
-from something like VR controllers.
-
-You can define your own Control Scheme with any combination of input devices you can think of:
-
-```ruby
-# Available inputs: :keyboard, :mouse, :touch, :controller_(one|four)
-cs = InputManager::ControlScheme.new([:touch, :mouse])
-```
-
-Or use one of the pre-defined schemes InputManager comes with:
-* `InputManager::ControlScheme.keyboard` - Represents keyboard input
-* `InputManager::ControlScheme.mouse` - Represents mouse input
-* `InputManager::ControlScheme.keyboard_and_mouse` - Represents a combination of keyboard and mouse input
-* `InputManager::ControlScheme.controller(:one/:four)` - Represents the 4 controllers managed by DR
-* `InputManager::ControlScheme.touch` - Represents touch input for mobile devices
 
 ### Binding
 
@@ -114,17 +91,9 @@ providing a state/modifier as well.
 ```ruby
 # Example without a modifier.
 # Returns true if up is pressed or held on the directional
-binding = Bindings::Base.new(
+binding = Bindings::Simple.new(
   :keyboard, # input device
   :directional_up # key/button
-)
-
-# Example with modifier.
-# Returns true if the A button on a controller was pressed on this frame.
-binding = Bindings::Base.new(
-  :controller, # input device. Note how we don't need to specify the controller number, that's a concern for the scheme.
-  :a, # key/button
-  :key_down # modifier
 )
 ```
 
@@ -137,12 +106,10 @@ the coordinates of the mouse pointer, or touch inputs.
 Value bindings return the current value of the input on each frame rather than a true/false state.
 This allows actions to use values for things like camera look based on mouse movement or touch drag gestures.
 
-You can access the value by defining a listener that takes the value as an argument:
+You can access the value of an action directly:
 
 ```ruby
-def on_jump(value)
-  # here value will be what DragonRuby returns when calling `args.inputs.<binding>`
-end
+@jump_action.value
 ```
 
 ### Action
@@ -154,7 +121,7 @@ Each action has a name and one or more `Binding`s associated with it to define h
 ```ruby
 jump = InputManager::Action.new(
   :select, # the name of the action
-  [Bindings::Base.new(:keyboard, :enter, :key_down)] # the list of bindings that trigger the action
+  bindings: 'keyboard/enter;keyboard/w' # the ';'-separated list of bindings that trigger the action
 )
 ```
 
@@ -166,33 +133,13 @@ either the spacebar on the keyboard or the A button on a controller.
 ```ruby
 jump = InputManager::Action.new(
   :jump, # the name of the action
-  [
-    Bindings::Base.new(:keyboard, :space, :key_down),
-    Bindings::Base.new(:controller, :a, :key_down)
-  ]
+  bindings: 'keyboard/space;controller/a'
 )
 ```
 
-#### Composite bindings
+### Interaction
 
-An action can have composite bindings that check multiple bindings at once.
-This allows checking combinations of inputs like "shift + w" or "left trigger held + a button pressed".
-To define a composite binding you can pass an array of bindings to the action:
-
-```ruby
-# DragonRuby doesn't have an event for left_click, only a "left_button" and a generic "click" events.
-# Using only the former will cause the action to trigger on each frame where the left button is held down, 
-# while the latter will correctly trigger only once, but does not distinguish between different mouse buttons.
-#
-# You can create a composite binding that checks both:
-left_click = InputManager::Action.new(
-  :left_click, # the name of the action
-  [
-    Bindings::Base.new(:mouse, :click),
-    Bindings::Base.new(:mouse, :button_left)
-  ]
-)
-```
+TBC
 
 ### ActionMap
 
@@ -206,8 +153,8 @@ separate ActionMaps for "Explore", "Vehicle", "Combat" modes so bindings don't c
 
 ```ruby
 gameplay_am = InputManager::ActionMap.new('Gameplay').tap |am|
-  am.register_action(:jump, [InputManager::Bindings::Base.new(:keyboard, :space, :key_down)])
-  am.register_action(:fire, [InputManager::Bindings::Base.new(:mouse, :click)])
+  am.register_action(:jump, bindings: 'keyboard/space')
+  am.register_action(:fire, bindings: 'mouse/click')
 end
 
 # As we saw in the "Quick Start" above, this is ptional but useful.
