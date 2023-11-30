@@ -19,7 +19,10 @@ module InputManager
       @bindings = []
       @interactions = []
       @default_interaction = InputManager::Interactions.default_interaction.tap { |i| i.action = self }
+
+      bindings = bindings.split(';') if bindings.is_a?(String)
       bindings.each { |b| add_binding(b) }
+      interactions = interactions.split(';') if interactions.is_a?(String)
       interactions.each { |i| add_interaction(i) }
 
       unless orphan || action_map
