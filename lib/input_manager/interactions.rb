@@ -37,6 +37,7 @@ module InputManager
       params
         .split(',')
         .map { |pair| pair.split('=') }
+        .to_h
         .transform_keys(&:to_sym)
     end
 
